@@ -14,6 +14,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@700&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;}
+
 body{
   font-family:'Noto Nastaliq Urdu', serif;
   background: linear-gradient(135deg,#001f1f,#000000);
@@ -83,9 +84,12 @@ h1{
   50%, 100%{opacity:0.3;}
 }
 
-/* Paragraph colors */
-.p1, .p2, .p3, .p4, .note{
-  color:purple;
+/* Heading and paragraph colors */
+#quoteCard h2 {
+    color: blue;
+}
+.p1, .p2, .p3, .p4, .note {
+    color: purple;
 }
 
 /* Divider */
@@ -185,7 +189,6 @@ function showQuote(i){
 function nextQuote(){if(filteredQuotes.length>0){index=(index+1)%filteredQuotes.length;showQuote(index);}}
 function randomQuote(){if(filteredQuotes.length>0){index=Math.floor(Math.random()*filteredQuotes.length);showQuote(index);}}
 
-
 function favoriteQuote(){
   if(filteredQuotes.length>0){
     let quoteText=filteredQuotes[index].text;
@@ -207,7 +210,6 @@ function filterCategory(cat, btnElement){
   showQuote(index);
 }
 
-// Share as Image
 function shareQuoteAsImage(){
   html2canvas(document.getElementById("quoteCard")).then(canvas=>{
     let imgData = canvas.toDataURL("image/png");

@@ -5,17 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Life Lines Quotes – Motivational & Emotional Quotes App</title>
 
-<!-- SEO Meta Tags -->
+<!-- SEO Meta -->
 <meta name="description" content="Life Lines Quotes – Daily motivational, emotional, and love quotes app. Share, favorite, and explore powerful life quotes anytime.">
 <meta name="keywords" content="quotes app, life quotes, motivational quotes, emotional quotes, love quotes, daily quotes, share quotes, favorite quotes, inspirational quotes">
 
 <style>
+  /* ===== Body & Fonts ===== */
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to bottom, #ffecd2, #fcb69f);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     min-height: 100vh;
     padding: 20px;
@@ -25,18 +26,40 @@
   h1 {
     color: #ff6b6b;
     font-size: 2em;
-    margin-bottom: 15px;
+    margin: 15px 0;
     text-shadow: 1px 1px 2px #fff;
   }
 
-  select {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 10px;
-    border: 1px solid #ff6b6b;
-    font-size: 1em;
+  /* ===== Categories Bar ===== */
+  #categoryBar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    max-width: 450px;
+    margin-bottom: 20px;
   }
 
+  .categoryBtn {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    margin-right: 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  .categoryBtn:hover, .categoryBtn.active {
+    background-color: #ff4757;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  /* ===== Quote Card ===== */
   #quote {
     background: white;
     padding: 25px;
@@ -53,7 +76,8 @@
     transform: scale(1.02);
   }
 
-  button {
+  /* ===== Buttons ===== */
+  .btn {
     padding: 12px 25px;
     margin: 8px;
     border: none;
@@ -66,45 +90,41 @@
     transition: all 0.3s ease;
   }
 
-  button:hover {
+  .btn:hover {
     background-color: #ff4757;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   }
 
   @media (max-width: 450px) {
-    #quote {
-      font-size: 1.2em;
-      padding: 20px;
-    }
-    h1 {
-      font-size: 1.5em;
-    }
-    button, select {
-      font-size: 0.9em;
-      padding: 10px 20px;
-    }
+    h1 { font-size: 1.5em; }
+    #quote { font-size: 1.2em; padding: 20px; }
+    .btn, .categoryBtn { font-size: 0.9em; padding: 10px 15px; }
   }
 </style>
 </head>
-<body>
 
+<body>
 <h1>Life Lines Quotes</h1>
 
-<!-- Categories Dropdown -->
-<select id="categorySelect" onchange="filterCategory()">
-  <option value="all">All Categories</option>
-  <option value="love">Love</option>
-  <option value="pain">Pain</option>
-  <option value="motivation">Motivation</option>
-</select>
+<!-- Category Buttons -->
+<div id="categoryBar">
+  <button class="categoryBtn active" onclick="filterCategory('all', this)">All</button>
+  <button class="categoryBtn" onclick="filterCategory('love', this)">Love</button>
+  <button class="categoryBtn" onclick="filterCategory('pain', this)">Pain</button>
+  <button class="categoryBtn" onclick="filterCategory('motivation', this)">Motivation</button>
+</div>
 
+<!-- Quote Display -->
 <div id="quote">Loading...</div>
 
-<button onclick="nextQuote()">Next</button>
-<button onclick="randomQuote()">Random</button>
-<button onclick="shareQuote()">Share</button>
-<button onclick="favoriteQuote()">❤️ Favorite</button>
+<!-- Action Buttons -->
+<div>
+  <button class="btn" onclick="nextQuote()">Next</button>
+  <button class="btn" onclick="randomQuote()">Random</button>
+  <button class="btn" onclick="shareQuote()">Share</button>
+  <button class="btn" onclick="favoriteQuote()">❤️ Favorite</button>
+</div>
 
 <script>
 let quotes = [];
@@ -134,7 +154,7 @@ function showQuote(i) {
   }
 }
 
-// Next Quote
+// Next / Random Quote
 function nextQuote() {
   if(filteredQuotes.length > 0){
     index = (index + 1) % filteredQuotes.length;
@@ -142,7 +162,6 @@ function nextQuote() {
   }
 }
 
-// Random Quote
 function randomQuote() {
   if(filteredQuotes.length > 0){
     index = Math.floor(Math.random() * filteredQuotes.length);
@@ -174,17 +193,19 @@ function favoriteQuote() {
 }
 
 // Filter by category
-function filterCategory() {
-  const category = document.getElementById("categorySelect").value;
-  if(category === "all"){
+function filterCategory(cat, btnElement){
+  // Remove active class from all buttons
+  document.querySelectorAll('.categoryBtn').forEach(b => b.classList.remove('active'));
+  btnElement.classList.add('active');
+
+  if(cat === 'all'){
     filteredQuotes = quotes;
   } else {
-    filteredQuotes = quotes.filter(q => q.category === category);
+    filteredQuotes = quotes.filter(q => q.category === cat);
   }
   index = 0;
   showQuote(index);
 }
 </script>
-
 </body>
 </html>

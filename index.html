@@ -8,7 +8,6 @@
 <meta name="description" content="LIFE LINES WISDOMS – روزانہ کے اردو اقتباسات، محبت، دکھ اور تحریک کے اقوال۔ شیئر کریں، پسندیدہ بنائیں، اور اپنے دل کو مضبوط کریں۔">
 <meta name="keywords" content="اردو اقتباسات, محبت کے اقتباسات, دکھ کے اقتباسات, تحریک کے اقتباسات, شیئر کریں, پسندیدہ اقتباسات">
 
-<!-- html2canvas library -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
@@ -30,10 +29,11 @@ h1{
   font-size:2rem;
   color:#ffd700;
   margin-bottom:15px;
-  text-shadow:0 0 20px gold;
+  text-shadow:0 0 30px gold, 0 0 60px #ffcc00;
   text-align:center;
 }
-/* Categories Bar */
+
+/* Category Buttons */
 #categoryBar{
   display:flex;
   justify-content:flex-start;
@@ -60,6 +60,7 @@ h1{
   transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(0,0,0,0.3);
 }
+
 /* Quote Card */
 #quoteCard{
   background: rgba(0,30,30,0.95);
@@ -76,12 +77,29 @@ h1{
 }
 #quoteCard:hover{transform: scale(1.02);}
 h2,h3,p{margin-bottom:10px;}
+
+/* Multicolor shining text */
+.p1, .p2, .p3, .p4, #quoteH2, .note{
+  background: linear-gradient(90deg, #ff0000, #ff6b00, #ffcc00, #66ff99, #00ccff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine 3s infinite linear;
+  text-shadow:0 0 5px #fff, 0 0 10px #fff, 0 0 20px #00ffcc, 0 0 30px #00ffcc, 0 0 40px #00ffcc;
+}
+@keyframes shine{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* Divider */
 .divider{
   width:60%;
   height:2px;
   background:linear-gradient(to right,transparent,#00ffcc,transparent);
   margin:18px auto;
 }
+
 /* Action Buttons */
 .btn{
   padding:12px 25px;
@@ -100,6 +118,7 @@ h2,h3,p{margin-bottom:10px;}
   transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(0,0,0,0.3);
 }
+
 @media(max-width:450px){
   h1{font-size:1.5rem;}
   #quoteCard{font-size:1rem;padding:20px;}

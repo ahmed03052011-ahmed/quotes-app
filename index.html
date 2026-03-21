@@ -62,22 +62,30 @@ h1{
 }
 
 /* Quote Card */
-#quote{
+#quoteCard{
   background: rgba(0,30,30,0.95);
   padding:25px;
   border-radius:35px;
   border:4px solid #00ffcc;
   box-shadow:0 0 35px #00ffcc;
   max-width:650px;
-  font-size:1.1rem;
   line-height:2.0;
   margin-bottom:20px;
-  min-height:150px;
+  min-height:200px;
   text-align:right;
   transition: transform 0.3s;
 }
-#quote:hover{
+#quoteCard:hover{
   transform: scale(1.02);
+}
+h2,h3,p{margin-bottom:10px;}
+
+/* Divider */
+.divider{
+  width:60%;
+  height:2px;
+  background:linear-gradient(to right,transparent,#00ffcc,transparent);
+  margin:18px auto;
 }
 
 /* Action Buttons */
@@ -101,7 +109,7 @@ h1{
 
 @media(max-width:450px){
   h1{font-size:1.5rem;}
-  #quote{font-size:1rem;padding:20px;}
+  #quoteCard{font-size:1rem;padding:20px;}
   .btn, .categoryBtn{font-size:0.9rem;padding:10px 15px;}
 }
 </style>
@@ -113,21 +121,30 @@ h1{
 
 <!-- Category Buttons -->
 <div id="categoryBar">
-  <button class="categoryBtn active" onclick="filterCategory('all', this)">تمام</button>
-  <button class="categoryBtn" onclick="filterCategory('love', this)">محبت</button>
-  <button class="categoryBtn" onclick="filterCategory('pain', this)">دکھ</button>
-  <button class="categoryBtn" onclick="filterCategory('motivation', this)">حوصلہ</button>
+  <button class="categoryBtn active" onclick="filterCategory('all', this)">All</button>
+  <button class="categoryBtn" onclick="filterCategory('love', this)">Love</button>
+  <button class="categoryBtn" onclick="filterCategory('pain', this)">Pain</button>
+  <button class="categoryBtn" onclick="filterCategory('motivation', this)">Motivation</button>
 </div>
 
-<!-- Quote Display -->
-<div id="quote">لوڈ ہو رہا ہے…</div>
+<!-- Quote Card -->
+<div id="quoteCard">
+  <h2 id="quoteH2">لوڈ ہو رہا ہے…</h2>
+  <div class="divider"></div>
+  <p class="p1" id="quoteP1"></p>
+  <p class="p2" id="quoteP2"></p>
+  <p class="p3" id="quoteP3"></p>
+  <p class="p4" id="quoteP4"></p>
+  <div class="divider"></div>
+  <p class="note" id="quoteNote"></p>
+</div>
 
 <!-- Action Buttons -->
 <div>
-  <button class="btn" onclick="nextQuote()">اگلا اقتباس</button>
-  <button class="btn" onclick="randomQuote()">بے ترتیب اقتباس</button>
-  <button class="btn" onclick="shareQuote()">شیئر کریں</button>
-  <button class="btn" onclick="favoriteQuote()">❤️ پسندیدہ</button>
+  <button class="btn" onclick="nextQuote()">Next Quote</button>
+  <button class="btn" onclick="randomQuote()">Random Quote</button>
+  <button class="btn" onclick="shareQuote()">Share</button>
+  <button class="btn" onclick="favoriteQuote()">❤️ Favorite</button>
 </div>
 
 <script>
@@ -145,16 +162,22 @@ fetch("quotes.json")
   showQuote(index);
 })
 .catch(err=>{
-  document.getElementById("quote").innerText="لوڈ کرنے میں خرابی!";
+  document.getElementById("quoteH2").innerText="Error loading quotes!";
   console.log(err);
 });
 
 // Show quote
 function showQuote(i){
   if(filteredQuotes.length>0){
-    document.getElementById("quote").innerText = filteredQuotes[i].text;
-  }else{
-    document.getElementById("quote").innerText = "اس زمرے میں کوئی اقتباس نہیں۔";
+    let q = filteredQuotes[i].text.split("\n");
+    document.getElementById("quoteH2").innerText = q[0] || "";
+    document.getElementById("quoteP1").innerText = q[1] || "";
+    document.getElementById("quoteP2").innerText = q[2] || "";
+    document.getElementById("quoteP3").innerText = q[3] || "";
+    document.getElementById("quoteP4").innerText = q[4] || "";
+    document.getElementById("quoteNote").innerText = q[5] || "";
+  } else {
+    document.getElementById("quoteH2").innerText = "No quotes in this category.";
   }
 }
 
@@ -177,9 +200,9 @@ function favoriteQuote(){
     let quoteText=filteredQuotes[index].text;
     if(!favorites.includes(quoteText)){
       favorites.push(quoteText);
-      alert("پسندیدہ میں شامل ہو گیا! ❤️");
+      alert("Added to favorites! ❤️");
     }else{
-      alert("پہلے سے موجود ہے! ❤️");
+      alert("Already in favorites! ❤️");
     }
     console.log("Favorites:",favorites);
   }

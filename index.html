@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Life Lines Quotes</title>
+<title>Life Lines Quotes – Motivational & Emotional Quotes App</title>
+
+<!-- SEO Meta Tags -->
+<meta name="description" content="Life Lines Quotes – Daily motivational, emotional, and love quotes app. Share, favorite, and explore powerful life quotes anytime.">
+<meta name="keywords" content="quotes app, life quotes, motivational quotes, emotional quotes, love quotes, daily quotes, share quotes, favorite quotes, inspirational quotes">
+
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,8 +25,16 @@
   h1 {
     color: #ff6b6b;
     font-size: 2em;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-shadow: 1px 1px 2px #fff;
+  }
+
+  select {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    border: 1px solid #ff6b6b;
+    font-size: 1em;
   }
 
   #quote {
@@ -32,6 +45,8 @@
     font-size: 1.4em;
     box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     transition: transform 0.3s;
+    min-height: 120px;
+    margin-bottom: 20px;
   }
 
   #quote:hover {
@@ -65,7 +80,7 @@
     h1 {
       font-size: 1.5em;
     }
-    button {
+    button, select {
       font-size: 0.9em;
       padding: 10px 20px;
     }
@@ -75,6 +90,15 @@
 <body>
 
 <h1>Life Lines Quotes</h1>
+
+<!-- Categories Dropdown -->
+<select id="categorySelect" onchange="filterCategory()">
+  <option value="all">All Categories</option>
+  <option value="love">Love</option>
+  <option value="pain">Pain</option>
+  <option value="motivation">Motivation</option>
+</select>
+
 <div id="quote">Loading...</div>
 
 <button onclick="nextQuote()">Next</button>
@@ -84,13 +108,16 @@
 
 <script>
 let quotes = [];
+let filteredQuotes = [];
 let favorites = [];
 let index = 0;
 
+// Fetch JSON
 fetch("quotes.json")
   .then(res => res.json())
   .then(data => {
     quotes = data.quotes;
+    filteredQuotes = quotes;
     showQuote(index);
   })
   .catch(err => {
@@ -98,33 +125,45 @@ fetch("quotes.json")
     console.log(err);
   });
 
+// Show quote
 function showQuote(i) {
-  document.getElementById("quote").innerText = quotes[i].text;
+  if(filteredQuotes.length > 0){
+    document.getElementById("quote").innerText = filteredQuotes[i].text;
+  } else {
+    document.getElementById("quote").innerText = "No quotes in this category.";
+  }
 }
 
+// Next Quote
 function nextQuote() {
-  index = (index + 1) % quotes.length;
-  showQuote(index);
+  if(filteredQuotes.length > 0){
+    index = (index + 1) % filteredQuotes.length;
+    showQuote(index);
+  }
 }
 
+// Random Quote
 function randomQuote() {
-  index = Math.floor(Math.random() * quotes.length);
-  showQuote(index);
+  if(filteredQuotes.length > 0){
+    index = Math.floor(Math.random() * filteredQuotes.length);
+    showQuote(index);
+  }
 }
 
+// Share Quote
 function shareQuote() {
-  if (quotes.length > 0) {
-    const text = encodeURIComponent(quotes[index].text);
+  if(filteredQuotes.length > 0){
+    const text = encodeURIComponent(filteredQuotes[index].text);
     const url = "https://api.whatsapp.com/send?text=" + text;
     window.open(url, "_blank");
   }
 }
 
-// ✅ New Feature: Save Favorite Quotes
+// Favorite Quote
 function favoriteQuote() {
-  if(quotes.length > 0) {
-    let quoteText = quotes[index].text;
-    if(!favorites.includes(quoteText)) {
+  if(filteredQuotes.length > 0){
+    let quoteText = filteredQuotes[index].text;
+    if(!favorites.includes(quoteText)){
       favorites.push(quoteText);
       alert("Added to favorites! ❤️");
     } else {
@@ -132,6 +171,18 @@ function favoriteQuote() {
     }
     console.log("Favorites:", favorites);
   }
+}
+
+// Filter by category
+function filterCategory() {
+  const category = document.getElementById("categorySelect").value;
+  if(category === "all"){
+    filteredQuotes = quotes;
+  } else {
+    filteredQuotes = quotes.filter(q => q.category === category);
+  }
+  index = 0;
+  showQuote(index);
 }
 </script>
 

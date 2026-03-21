@@ -175,50 +175,221 @@ fetch("quotes.json")
 function showQuote(i){
   if(filteredQuotes.length>0){
     let q = filteredQuotes[i].text.split("\n");
-    document.getElementById("quoteH2").innerText = q[0] || "";
-    document.getElementById("quoteP1").innerText = q[1] || "";
-    document.getElementById("quoteP2").innerText = q[2] || "";
-    document.getElementById("quoteP3").innerText = q[3] || "";
-    document.getElementById("quoteP4").innerText = q[4] || "";
-    document.getElementById("quoteNote").innerText = q[5] || "";
-  } else {
-    document.getElementById("quoteH2").innerText = "No quotes in this category.";
-  }
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>LIFE LINES WISDOMS</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+body{
+font-family:'Noto Nastaliq Urdu', serif;
+background:linear-gradient(135deg,#001f1f,#000);
+color:white;
+text-align:center;
+padding:20px;
 }
 
-function nextQuote(){if(filteredQuotes.length>0){index=(index+1)%filteredQuotes.length;showQuote(index);}}
-function randomQuote(){if(filteredQuotes.length>0){index=Math.floor(Math.random()*filteredQuotes.length);showQuote(index);}}
+h1{color:#00ff88;}
 
-function favoriteQuote(){
-  if(filteredQuotes.length>0){
-    let quoteText=filteredQuotes[index].text;
-    if(!favorites.includes(quoteText)){
-      favorites.push(quoteText);
-      alert("Added to favorites! ❤️");
-    }else{
-      alert("Already in favorites! ❤️");
-    }
-    console.log("Favorites:",favorites);
-  }
+#searchBox{
+padding:10px;
+width:90%;
+max-width:600px;
+border-radius:10px;
+margin-bottom:10px;
 }
 
-function filterCategory(cat, btnElement){
-  document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
-  btnElement.classList.add('active');
-  if(cat==='all'){filteredQuotes=quotes;}else{filteredQuotes=quotes.filter(q=>q.category===cat);}
+.categoryBtn{
+background:#6a0dad;
+color:white;
+border:none;
+padding:8px 15px;
+margin:5px;
+border-radius:20px;
+cursor:pointer;
+}
+.categoryBtn.active{background:#9400d3;}
+
+#quoteCard{
+background:#111;
+border:3px solid #9400d3;
+border-radius:20px;
+padding:20px;
+margin:20px auto;
+max-width:600px;
+line-height:2;
+}
+
+.btn{
+padding:10px 15px;
+margin:5px;
+border:none;
+border-radius:10px;
+background:#6a0dad;
+color:white;
+cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>LIFE LINES WISDOMS</h1>
+
+<input id="searchBox" placeholder="Search..." onkeyup="searchQuotes()">
+
+<p id="viewCount">Viewed: 0</p>
+
+<div>
+<button class="categoryBtn active" onclick="filterCategory('all',this)">All</button>
+<button class="categoryBtn" onclick="filterCategory('love',this)">Love</button>
+<button class="categoryBtn" onclick="filterCategory('pain',this)">Pain</button>
+<button class="categoryBtn" onclick="filterCategory('motivation',this)">Motivation</button>
+</div>
+
+<div id="quoteCard">
+<h2 id="quoteText">لوڈ ہو رہا ہے…</h2>
+</div>
+
+<div>
+<button class="btn" onclick="nextQuote()">Next</button>
+<button class="btn" onclick="randomQuote()">Random</button>
+<button class="btn" onclick="copyQuote()">Copy</button>
+<button class="btn" onclick="shareWhatsApp()">WhatsApp</button>
+<button class="btn" onclick="shareAllQuotes()">Share All</button>
+<button class="btn" onclick="shareImage()">Image</button>
+<button class="btn" onclick="favoriteQuote()">❤️</button>
+<button class="btn" onclick="showFavorites()">Favorites</button>
+</div>
+
+<script>
+
+let quotes = [];
+let filteredQuotes = [];
+let index = 0;
+
+// 🔗 FETCH FROM GITHUB (CHANGE USERNAME & REPO)
+fetch("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/quotes.json")
+.then(res=>res.json())
+.then(data=>{
+  quotes = data.quotes;
+  filteredQuotes = quotes;
+  showQuote();
+})
+.catch(()=>{
+  document.getElementById("quoteText").innerText="Error loading quotes!";
+});
+
+// SHOW QUOTE
+function showQuote(){
+  if(filteredQuotes.length===0){
+    quoteText.innerText="No quotes found";
+    return;
+  }
+  let q = filteredQuotes[index].text.split("\n");
+  quoteText.innerHTML = q.join("<br>");
+  updateViews();
+}
+
+// NEXT
+function nextQuote(){
+  index=(index+1)%filteredQuotes.length;
+  showQuote();
+}
+
+// RANDOM
+function randomQuote(){
+  index=Math.floor(Math.random()*filteredQuotes.length);
+  showQuote();
+}
+
+// SEARCH
+function searchQuotes(){
+  let val=searchBox.value.toLowerCase();
+  filteredQuotes=quotes.filter(q=>q.text.toLowerCase().includes(val));
   index=0;
-  showQuote(index);
+  showQuote();
 }
 
-function shareQuoteAsImage(){
+// CATEGORY
+function filterCategory(cat,btn){
+  document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+
+  filteredQuotes = cat==="all"?quotes:quotes.filter(q=>q.category===cat);
+  index=0;
+  showQuote();
+}
+
+// COPY
+function copyQuote(){
+  navigator.clipboard.writeText(filteredQuotes[index].text);
+  alert("Copied!");
+}
+
+// WHATSAPP
+function shareWhatsApp(){
+  let text=filteredQuotes[index].text;
+  window.open("https://wa.me/?text="+encodeURIComponent(text));
+}
+
+// SHARE ALL
+function shareAllQuotes(){
+  let text=filteredQuotes.map(q=>q.text).join("\n\n");
+  if(navigator.share){
+    navigator.share({text});
+  }
+}
+
+// IMAGE
+function shareImage(){
   html2canvas(document.getElementById("quoteCard")).then(canvas=>{
-    let imgData = canvas.toDataURL("image/png");
-    let link = document.createElement('a');
-    link.href = imgData;
-    link.download = 'quote.png';
+    let link=document.createElement("a");
+    link.href=canvas.toDataURL();
+    link.download="quote.png";
     link.click();
   });
 }
+
+// FAVORITES
+function favoriteQuote(){
+  let favs=JSON.parse(localStorage.getItem("fav"))||[];
+  let text=filteredQuotes[index].text;
+
+  if(!favs.includes(text)){
+    favs.push(text);
+    localStorage.setItem("fav",JSON.stringify(favs));
+    alert("Saved ❤️");
+  }
+}
+
+function showFavorites(){
+  let favs=JSON.parse(localStorage.getItem("fav"))||[];
+
+  if(favs.length===0){
+    alert("No favorites");
+    return;
+  }
+
+  filteredQuotes=favs.map(t=>({text:t}));
+  index=0;
+  showQuote();
+}
+
+// VIEW COUNTER
+let views=localStorage.getItem("views")||0;
+
+function updateViews(){
+  views++;
+  localStorage.setItem("views",views);
+  document.getElementById("viewCount").innerText="Viewed: "+views;
+}
+
 </script>
 
 </body>

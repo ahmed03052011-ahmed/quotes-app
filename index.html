@@ -5,85 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>LIFE LINES WISDOMS – اردو اقتباسات اور حکمت</title>
+<meta name="description" content="LIFE LINES WISDOMS – روزانہ کے اردو اقتباسات، محبت، دکھ اور تحریک کے اقوال۔ شیئر کریں، پسندیدہ بنائیں، اور اپنے دل کو مضبوط کریں۔">
+<meta name="keywords" content="اردو اقتباسات, محبت کے اقتباسات, دکھ کے اقتباسات, تحریک کے اقتباسات, شیئر کریں, پسندیدہ اقتباسات">
 
+<!-- html2canvas library -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@700&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;}
-
 body{
   font-family:'Noto Nastaliq Urdu', serif;
   background: linear-gradient(135deg,#001f1f,#000000);
   display:flex;
   flex-direction:column;
+  justify-content:flex-start;
   align-items:center;
   min-height:100vh;
   padding:20px;
-  color:skyblue;
+  color:white;
 }
-
 h1{
   font-size:2rem;
-  color:blue;
+  color:#ffd700;
   margin-bottom:15px;
-  animation: blink 1.5s infinite;
+  text-shadow:0 0 20px gold;
+  text-align:center;
 }
-
-/* Card */
+/* Categories Bar */
+#categoryBar{
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+  width:100%;
+  max-width:650px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+.categoryBtn{
+  background-color:#ff6b6b;
+  color:white;
+  border:none;
+  padding:10px 20px;
+  margin:5px;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:1rem;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+.categoryBtn:hover,.categoryBtn.active{
+  background-color:#ff4757;
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+}
+/* Quote Card */
 #quoteCard{
   background: rgba(0,30,30,0.95);
   padding:25px;
   border-radius:35px;
-  border:4px solid #9400d3;
-  box-shadow:0 0 35px #9400d3;
+  border:4px solid #00ffcc;
+  box-shadow:0 0 35px #00ffcc;
   max-width:650px;
+  line-height:2.0;
+  margin-bottom:20px;
+  min-height:200px;
   text-align:right;
+  transition: transform 0.3s;
 }
-
-/* Heading blue */
-#quoteCard h2{
-  color:blue;
-}
-
-/* Paragraphs purple */
-.p1, .p2, .p3, .p4, .note{
-  color:purple;
-}
-
-/* Individual blinking (different timing) */
-.p1{animation: blink 2s infinite;}
-.p2{animation: blink 2.5s infinite;}
-.p3{animation: blink 3s infinite;}
-.p4{animation: blink 3.5s infinite;}
-.note{animation: blink 4s infinite;}
-
-/* Blink animation */
-@keyframes blink{
-  0%,49%{opacity:1;}
-  50%,100%{opacity:0.3;}
-}
-
-/* Divider */
+#quoteCard:hover{transform: scale(1.02);}
+h2,h3,p{margin-bottom:10px;}
 .divider{
   width:60%;
   height:2px;
-  background:#9400d3;
-  margin:15px auto;
+  background:linear-gradient(to right,transparent,#00ffcc,transparent);
+  margin:18px auto;
 }
-
-/* Buttons */
+/* Action Buttons */
 .btn{
-  padding:10px 20px;
-  margin:5px;
+  padding:12px 25px;
+  margin:8px;
   border:none;
-  border-radius:10px;
-  background:#6a0dad;
+  border-radius:12px;
+  background-color:#ff6b6b;
   color:white;
+  font-size:1rem;
   cursor:pointer;
+  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
 }
-
+.btn:hover{
+  background-color:#ff4757;
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.3);
+}
+@media(max-width:450px){
+  h1{font-size:1.5rem;}
+  #quoteCard{font-size:1rem;padding:20px;}
+  .btn, .categoryBtn{font-size:0.9rem;padding:10px 15px;}
+}
 </style>
 </head>
 
@@ -91,15 +112,20 @@ h1{
 
 <h1>LIFE LINES WISDOMS</h1>
 
+<div id="categoryBar">
+  <button class="categoryBtn active" onclick="filterCategory('all', this)">All</button>
+  <button class="categoryBtn" onclick="filterCategory('love', this)">Love</button>
+  <button class="categoryBtn" onclick="filterCategory('pain', this)">Pain</button>
+  <button class="categoryBtn" onclick="filterCategory('motivation', this)">Motivation</button>
+</div>
+
 <div id="quoteCard">
   <h2 id="quoteH2">لوڈ ہو رہا ہے…</h2>
   <div class="divider"></div>
-
   <p class="p1" id="quoteP1"></p>
   <p class="p2" id="quoteP2"></p>
   <p class="p3" id="quoteP3"></p>
   <p class="p4" id="quoteP4"></p>
-
   <div class="divider"></div>
   <p class="note" id="quoteNote"></p>
 </div>
@@ -108,44 +134,76 @@ h1{
   <button class="btn" onclick="nextQuote()">Next Quote</button>
   <button class="btn" onclick="randomQuote()">Random Quote</button>
   <button class="btn" onclick="shareQuoteAsImage()">Share</button>
+  <button class="btn" onclick="favoriteQuote()">❤️ Favorite</button>
 </div>
 
 <script>
 let quotes = [];
+let filteredQuotes = [];
+let favorites = [];
 let index = 0;
 
+// Fetch JSON
 fetch("quotes.json")
 .then(res=>res.json())
 .then(data=>{
   quotes = data.quotes;
+  filteredQuotes = quotes;
   showQuote(index);
+})
+.catch(err=>{
+  document.getElementById("quoteH2").innerText="Error loading quotes!";
+  console.log(err);
 });
 
 function showQuote(i){
-  let q = quotes[i].text.split("\n");
-  document.getElementById("quoteH2").innerText = q[0] || "";
-  document.getElementById("quoteP1").innerText = q[1] || "";
-  document.getElementById("quoteP2").innerText = q[2] || "";
-  document.getElementById("quoteP3").innerText = q[3] || "";
-  document.getElementById("quoteP4").innerText = q[4] || "";
-  document.getElementById("quoteNote").innerText = q[5] || "";
+  if(filteredQuotes.length>0){
+    let q = filteredQuotes[i].text.split("\n");
+    document.getElementById("quoteH2").innerText = q[0] || "";
+    document.getElementById("quoteP1").innerText = q[1] || "";
+    document.getElementById("quoteP2").innerText = q[2] || "";
+    document.getElementById("quoteP3").innerText = q[3] || "";
+    document.getElementById("quoteP4").innerText = q[4] || "";
+    document.getElementById("quoteNote").innerText = q[5] || "";
+  } else {
+    document.getElementById("quoteH2").innerText = "No quotes in this category.";
+  }
 }
 
-function nextQuote(){
-  index = (index+1)%quotes.length;
+// Next / Random
+function nextQuote(){if(filteredQuotes.length>0){index=(index+1)%filteredQuotes.length;showQuote(index);}}
+function randomQuote(){if(filteredQuotes.length>0){index=Math.floor(Math.random()*filteredQuotes.length);showQuote(index);}}
+
+// Favorite
+function favoriteQuote(){
+  if(filteredQuotes.length>0){
+    let quoteText=filteredQuotes[index].text;
+    if(!favorites.includes(quoteText)){
+      favorites.push(quoteText);
+      alert("Added to favorites! ❤️");
+    }else{
+      alert("Already in favorites! ❤️");
+    }
+    console.log("Favorites:",favorites);
+  }
+}
+
+// Filter by category
+function filterCategory(cat, btnElement){
+  document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
+  btnElement.classList.add('active');
+  if(cat==='all'){filteredQuotes=quotes;}else{filteredQuotes=quotes.filter(q=>q.category===cat);}
+  index=0;
   showQuote(index);
 }
 
-function randomQuote(){
-  index = Math.floor(Math.random()*quotes.length);
-  showQuote(index);
-}
-
+// 🌟 Share as Image
 function shareQuoteAsImage(){
   html2canvas(document.getElementById("quoteCard")).then(canvas=>{
-    let link=document.createElement('a');
-    link.href=canvas.toDataURL();
-    link.download="quote.png";
+    let imgData = canvas.toDataURL("image/png");
+    let link = document.createElement('a');
+    link.href = imgData;
+    link.download = 'quote.png';
     link.click();
   });
 }

@@ -8,11 +8,13 @@
 <meta name="description" content="LIFE LINES WISDOMS – روزانہ کے اردو اقتباسات، محبت، دکھ اور تحریک کے اقوال۔ شیئر کریں، پسندیدہ بنائیں، اور اپنے دل کو مضبوط کریں۔">
 <meta name="keywords" content="اردو اقتباسات, محبت کے اقتباسات, دکھ کے اقتباسات, تحریک کے اقتباسات, شیئر کریں, پسندیدہ اقتباسات">
 
+<!-- html2canvas library -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@700&display=swap');
 
 *{margin:0;padding:0;box-sizing:border-box;}
-
 body{
   font-family:'Noto Nastaliq Urdu', serif;
   background: linear-gradient(135deg,#001f1f,#000000);
@@ -24,7 +26,6 @@ body{
   padding:20px;
   color:white;
 }
-
 h1{
   font-size:2rem;
   color:#ffd700;
@@ -32,7 +33,6 @@ h1{
   text-shadow:0 0 20px gold;
   text-align:center;
 }
-
 /* Categories Bar */
 #categoryBar{
   display:flex;
@@ -60,7 +60,6 @@ h1{
   transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(0,0,0,0.3);
 }
-
 /* Quote Card */
 #quoteCard{
   background: rgba(0,30,30,0.95);
@@ -75,19 +74,14 @@ h1{
   text-align:right;
   transition: transform 0.3s;
 }
-#quoteCard:hover{
-  transform: scale(1.02);
-}
+#quoteCard:hover{transform: scale(1.02);}
 h2,h3,p{margin-bottom:10px;}
-
-/* Divider */
 .divider{
   width:60%;
   height:2px;
   background:linear-gradient(to right,transparent,#00ffcc,transparent);
   margin:18px auto;
 }
-
 /* Action Buttons */
 .btn{
   padding:12px 25px;
@@ -106,7 +100,6 @@ h2,h3,p{margin-bottom:10px;}
   transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(0,0,0,0.3);
 }
-
 @media(max-width:450px){
   h1{font-size:1.5rem;}
   #quoteCard{font-size:1rem;padding:20px;}
@@ -119,7 +112,6 @@ h2,h3,p{margin-bottom:10px;}
 
 <h1>LIFE LINES WISDOMS</h1>
 
-<!-- Category Buttons -->
 <div id="categoryBar">
   <button class="categoryBtn active" onclick="filterCategory('all', this)">All</button>
   <button class="categoryBtn" onclick="filterCategory('love', this)">Love</button>
@@ -127,7 +119,6 @@ h2,h3,p{margin-bottom:10px;}
   <button class="categoryBtn" onclick="filterCategory('motivation', this)">Motivation</button>
 </div>
 
-<!-- Quote Card -->
 <div id="quoteCard">
   <h2 id="quoteH2">لوڈ ہو رہا ہے…</h2>
   <div class="divider"></div>
@@ -139,11 +130,10 @@ h2,h3,p{margin-bottom:10px;}
   <p class="note" id="quoteNote"></p>
 </div>
 
-<!-- Action Buttons -->
 <div>
   <button class="btn" onclick="nextQuote()">Next Quote</button>
   <button class="btn" onclick="randomQuote()">Random Quote</button>
-  <button class="btn" onclick="shareQuote()">Share</button>
+  <button class="btn" onclick="shareQuoteAsImage()">Share</button>
   <button class="btn" onclick="favoriteQuote()">❤️ Favorite</button>
 </div>
 
@@ -166,7 +156,6 @@ fetch("quotes.json")
   console.log(err);
 });
 
-// Show quote
 function showQuote(i){
   if(filteredQuotes.length>0){
     let q = filteredQuotes[i].text.split("\n");
@@ -184,15 +173,6 @@ function showQuote(i){
 // Next / Random
 function nextQuote(){if(filteredQuotes.length>0){index=(index+1)%filteredQuotes.length;showQuote(index);}}
 function randomQuote(){if(filteredQuotes.length>0){index=Math.floor(Math.random()*filteredQuotes.length);showQuote(index);}}
-
-// Share
-function shareQuote(){
-  if(filteredQuotes.length>0){
-    const text=encodeURIComponent(filteredQuotes[index].text);
-    const url="https://api.whatsapp.com/send?text="+text;
-    window.open(url,"_blank");
-  }
-}
 
 // Favorite
 function favoriteQuote(){
@@ -215,6 +195,17 @@ function filterCategory(cat, btnElement){
   if(cat==='all'){filteredQuotes=quotes;}else{filteredQuotes=quotes.filter(q=>q.category===cat);}
   index=0;
   showQuote(index);
+}
+
+// 🌟 Share as Image
+function shareQuoteAsImage(){
+  html2canvas(document.getElementById("quoteCard")).then(canvas=>{
+    let imgData = canvas.toDataURL("image/png");
+    let link = document.createElement('a');
+    link.href = imgData;
+    link.download = 'quote.png';
+    link.click();
+  });
 }
 </script>
 

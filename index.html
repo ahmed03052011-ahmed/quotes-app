@@ -87,7 +87,7 @@ font-weight:bold;
 
 <body>
 
-<!-- 🔥 APP NAME -->
+<!-- APP NAME -->
 <div class="appTitle">Life Lines Wisdoms</div>
 
 <!-- CATEGORY -->
@@ -103,7 +103,7 @@ font-weight:bold;
 
 <!-- CARD -->
 <div class="card" id="card">
-<h2 id="title"></h2>
+<h2 id="title">لوڈ ہو رہا ہے…</h2>
 
 <div class="divider"></div>
 
@@ -121,8 +121,7 @@ font-weight:bold;
 <!-- BUTTONS -->
 <div>
 <button class="btn" onclick="nextQuote()">Next</button>
-<button class="btn" onclick="downloadImage()">Download JPG</button>
-<button class="btn" onclick="shareWhatsAppImage()">Share WhatsApp</button>
+<button class="btn" onclick="downloadAndShare()">Download & Share</button>
 </div>
 
 <script>
@@ -131,6 +130,7 @@ let quotes=[];
 let filteredQuotes=[];
 let index=0;
 
+/* LOAD JSON */
 fetch("quotes.json")
 .then(res=>res.json())
 .then(data=>{
@@ -139,6 +139,7 @@ filteredQuotes=quotes;
 showQuote();
 });
 
+/* SHOW */
 function showQuote(){
 let q=filteredQuotes[index];
 
@@ -151,11 +152,13 @@ p5.innerHTML=q.p5.replace(/\n/g,"<br>");
 note.innerHTML=q.note;
 }
 
+/* NEXT */
 function nextQuote(){
 index=(index+1)%filteredQuotes.length;
 showQuote();
 }
 
+/* CATEGORY */
 function filterCategory(cat,btn){
 document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
 btn.classList.add('active');
@@ -165,23 +168,33 @@ index=0;
 showQuote();
 }
 
-function downloadImage(){
+/* DOWNLOAD + SHARE (ALL APPS) */
+function downloadAndShare(){
 html2canvas(document.getElementById("card")).then(canvas=>{
-let link=document.createElement("a");
-link.download="quote.jpg";
-link.href=canvas.toDataURL("image/jpeg");
-link.click();
+
+canvas.toBlob(async function(blob){
+
+const file = new File([blob], "quote.jpg", { type: "image/jpeg" });
+
+if(navigator.share){
+try{
+await navigator.share({
+files: [file],
+title: "Life Lines Wisdoms",
+text: "Check this quote"
 });
+}catch(err){
+console.log("Share cancelled", err);
+}
+}else{
+let link=document.createElement("a");
+link.href=URL.createObjectURL(blob);
+link.download="quote.jpg";
+link.click();
 }
 
-function shareWhatsAppImage(){
-html2canvas(document.getElementById("card")).then(canvas=>{
-let link=document.createElement("a");
-link.href=canvas.toDataURL("image/jpeg");
-link.download="quote.jpg";
-link.click();
+});
 
-window.open("https://wa.me/?text=Check this quote!");
 });
 }
 

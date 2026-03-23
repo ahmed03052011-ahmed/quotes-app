@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Life Lines Wisdoms</title>
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
@@ -35,25 +33,27 @@ font-weight:bold;
 .categoryBar{margin-bottom:15px;}
 .categoryBtn{
 background:#00ffcc;
-color:black;
+color:white;
 border:none;
 padding:8px 15px;
 margin:4px;
 border-radius:20px;
 cursor:pointer;
+font-weight:bold;
 }
-.categoryBtn.active{background:#00cc99;}
+.categoryBtn.active{background:#0077cc;}
 
 /* CARD */
 .card{
 max-width:650px;
 background:rgba(0,30,30,0.95);
 border-radius:35px;
-border:4px solid #00ffcc;
-box-shadow:0 0 35px #00ffcc;
+border:4px solid #00ff00;
+box-shadow:0 0 35px #00ff00;
 padding:30px 20px;
 text-align:center;
 line-height:2;
+margin-bottom:15px;
 }
 
 h2{color:gold;}
@@ -68,7 +68,7 @@ h2{color:gold;}
 
 .divider{
 height:2px;
-background:linear-gradient(to right,transparent,#00ffcc,transparent);
+background:linear-gradient(to right,transparent,#00ff00,transparent);
 margin:15px;
 }
 
@@ -82,18 +82,39 @@ background:#00ffcc;
 cursor:pointer;
 font-weight:bold;
 }
+
+#newBtn{
+background:#ff9900;
+color:white;
+display:none;
+margin:10px 0;
+padding:10px 15px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 APP NAME -->
+<!-- APP NAME -->
 <div class="appTitle">Life Lines Wisdoms</div>
 
 <!-- CATEGORY -->
-<div class="categoryBar" id="categoryBar">
-  <!-- Buttons will be dynamically generated with counts -->
+<div class="categoryBar">
+<button class="categoryBtn active" onclick="filterCategory('all',this)">All <span id="allCount"></span></button>
+<button class="categoryBtn" onclick="filterCategory('love',this)">Love <span id="loveCount"></span></button>
+<button class="categoryBtn" onclick="filterCategory('pain',this)">Pain <span id="painCount"></span></button>
+<button class="categoryBtn" onclick="filterCategory('motivation',this)">Motivation <span id="motivationCount"></span></button>
+<button class="categoryBtn" onclick="filterCategory('life',this)">Life <span id="lifeCount"></span></button>
+<button class="categoryBtn" onclick="filterCategory('sad',this)">Sad <span id="sadCount"></span></button>
+<button class="categoryBtn" onclick="filterCategory('islamic',this)">Islamic <span id="islamicCount"></span></button>
 </div>
+
+<!-- New Quotes Notification -->
+<button id="newBtn" onclick="showNewQuotes()">New Quotes Available!</button>
 
 <!-- CARD -->
 <div class="card" id="card">
@@ -112,112 +133,99 @@ font-weight:bold;
 <p class="note" id="note"></p>
 </div>
 
-<!-- BUTTONS -->
+<!-- NAVIGATION & SHARE -->
 <div>
 <button class="btn" onclick="previousQuote()">Previous</button>
-<button class="btn" onclick="shareQuote()">Share & Download</button>
 <button class="btn" onclick="nextQuote()">Next</button>
+<button class="btn" onclick="downloadShare()">Download & Share Quote 📤</button>
 </div>
 
 <script>
 let quotes=[];
 let filteredQuotes=[];
 let index=0;
-let categories=["love","pain","motivation","life","sad","islamic"];
-let categoryCounts={};
+let lastSeenId = localStorage.getItem("lastSeenId") || 0;
 
-// Fetch quotes.json
+// Load quotes.json
 fetch("quotes.json")
 .then(res=>res.json())
 .then(data=>{
-  quotes=data.quotes;
-  filteredQuotes=quotes;
-  countCategories();
-  generateCategoryButtons();
-  showQuote();
+quotes=data.quotes;
+filteredQuotes = quotes;
+updateCategoryCounts();
+checkNewQuotes();
+showQuote();
 });
 
-// Count quotes in each category and total
-function countCategories(){
-  categoryCounts={all:quotes.length};
-  categories.forEach(cat=>{
-    categoryCounts[cat]=quotes.filter(q=>q.category===cat).length;
-  });
-}
-
-// Generate category buttons with counts
-function generateCategoryButtons(){
-  const bar=document.getElementById("categoryBar");
-  bar.innerHTML="";
-  // All button first
-  const allBtn=document.createElement("button");
-  allBtn.className="categoryBtn active";
-  allBtn.innerText=`All (${categoryCounts.all})`;
-  allBtn.onclick=function(){filterCategory('all',this);};
-  bar.appendChild(allBtn);
-
-  // Other categories
-  categories.forEach(cat=>{
-    const btn=document.createElement("button");
-    btn.className="categoryBtn";
-    btn.innerText=`${capitalize(cat)} (${categoryCounts[cat]})`;
-    btn.onclick=function(){filterCategory(cat,this);};
-    bar.appendChild(btn);
-  });
-}
-
-// Capitalize first letter
-function capitalize(str){
-  return str.charAt(0).toUpperCase()+str.slice(1);
-}
-
-// Show quote
 function showQuote(){
-  let q=filteredQuotes[index];
-  if(!q) return;
-  title.innerHTML=q.title.replace(/\n/g,"<br>");
-  p1.innerHTML=q.p1.replace(/\n/g,"<br>");
-  p2.innerHTML=q.p2.replace(/\n/g,"<br>");
-  p3.innerHTML=q.p3.replace(/\n/g,"<br>");
-  p4.innerHTML=q.p4.replace(/\n/g,"<br>");
-  p5.innerHTML=q.p5.replace(/\n/g,"<br>");
-  note.innerHTML=q.note;
+if(filteredQuotes.length===0) return;
+let q = filteredQuotes[index];
+title.innerHTML = q.title.replace(/\n/g,"<br>");
+p1.innerHTML = q.p1.replace(/\n/g,"<br>");
+p2.innerHTML = q.p2.replace(/\n/g,"<br>");
+p3.innerHTML = q.p3.replace(/\n/g,"<br>");
+p4.innerHTML = q.p4.replace(/\n/g,"<br>");
+p5.innerHTML = q.p5.replace(/\n/g,"<br>");
+note.innerHTML = q.note;
 }
 
-// Next & Previous
-function nextQuote(){index=(index+1)%filteredQuotes.length;showQuote();}
-function previousQuote(){index=(index-1+filteredQuotes.length)%filteredQuotes.length;showQuote();}
-
-// Filter category
-function filterCategory(cat,btn){
-  document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  filteredQuotes=cat==="all"?quotes:quotes.filter(q=>q.category===cat);
-  index=0;
-  showQuote();
+function nextQuote(){
+index = (index+1)%filteredQuotes.length;
+showQuote();
+}
+function previousQuote(){
+index = (index-1 + filteredQuotes.length)%filteredQuotes.length;
+showQuote();
 }
 
-// Share & Download as JPG
-function shareQuote(){
-  html2canvas(document.getElementById("card")).then(canvas=>{
-    const link=document.createElement("a");
-    link.download="quote.jpg";
-    link.href=canvas.toDataURL("image/jpeg");
-    link.click();
+function filterCategory(cat, btn){
+document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+filteredQuotes = cat==="all"?quotes:quotes.filter(q=>q.category===cat);
+index=0;
+showQuote();
+}
 
-    // Also open share options (WhatsApp, etc)
-    if(navigator.share){
-      canvas.toBlob(blob=>{
-        const file=new File([blob],"quote.jpg",{type:"image/jpeg"});
-        navigator.share({
-          files:[file],
-          text:"Check this amazing quote!",
-        });
-      });
-    } else {
-      alert("Your device does not support direct sharing. You can download the image and share manually.");
-    }
-  });
+function downloadShare(){
+html2canvas(document.getElementById("card")).then(canvas=>{
+let link=document.createElement("a");
+link.download="quote.jpg";
+link.href=canvas.toDataURL("image/jpeg");
+link.click();
+
+// Open native share dialog (APK devices)
+if(navigator.share){
+canvas.toBlob(blob=>{
+let file = new File([blob], "quote.jpg",{type:"image/jpeg"});
+navigator.share({files:[file],title:"Life Lines Wisdoms",text:"Check this quote!"});
+});
+}
+});
+}
+
+// Update category counts
+function updateCategoryCounts(){
+let cats = ["all","love","pain","motivation","life","sad","islamic"];
+cats.forEach(cat=>{
+let count = cat==="all"?quotes.length:quotes.filter(q=>q.category===cat).length;
+document.getElementById(cat+"Count").innerText = `(${count})`;
+});
+}
+
+// Check new quotes
+function checkNewQuotes(){
+let maxId = Math.max(...quotes.map(q=>q.id));
+if(maxId > lastSeenId){
+document.getElementById("newBtn").style.display = "block";
+localStorage.setItem("lastSeenId", maxId);
+}
+}
+
+function showNewQuotes(){
+filteredQuotes = quotes;
+index=0;
+showQuote();
+document.getElementById("newBtn").style.display = "none";
 }
 </script>
 

@@ -3,54 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Life Lines Wisdoms</title>
+
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@700&display=swap');
 
 body{
-  font-family:'Noto Nastaliq Urdu',serif;
-  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  min-height:100vh;
-  padding:20px;
-  color:white;
+font-family:'Noto Nastaliq Urdu',serif;
+background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+display:flex;
+flex-direction:column;
+align-items:center;
+min-height:100vh;
+padding:20px;
+color:white;
 }
 
 /* APP TITLE */
 .appTitle{
-  font-size:1.9rem;
-  color:#00ffcc;
-  margin-bottom:15px;
-  text-shadow:0 0 15px #00ffcc;
-  font-weight:bold;
+font-size:1.9rem;
+color:#00ffcc;
+margin-bottom:15px;
+text-shadow:0 0 15px #00ffcc;
+font-weight:bold;
 }
 
 /* CATEGORY */
 .categoryBar{margin-bottom:15px;}
 .categoryBtn{
-  background:#00ffcc;
-  color:black;
-  border:none;
-  padding:8px 15px;
-  margin:4px;
-  border-radius:20px;
-  cursor:pointer;
+background:#00ffcc;
+color:black;
+border:none;
+padding:8px 15px;
+margin:4px;
+border-radius:20px;
+cursor:pointer;
 }
 .categoryBtn.active{background:#00cc99;}
 
 /* CARD */
 .card{
-  max-width:650px;
-  background:rgba(0,30,30,0.95);
-  border-radius:35px;
-  border:4px solid #00ffcc;
-  box-shadow:0 0 35px #00ffcc;
-  padding:30px 20px;
-  text-align:center;
-  line-height:2;
+max-width:650px;
+background:rgba(0,30,30,0.95);
+border-radius:35px;
+border:4px solid #00ffcc;
+box-shadow:0 0 35px #00ffcc;
+padding:30px 20px;
+text-align:center;
+line-height:2;
 }
 
 h2{color:gold;}
@@ -64,128 +67,156 @@ h2{color:gold;}
 .note{color:gold;margin-top:10px;}
 
 .divider{
-  height:2px;
-  background:linear-gradient(to right,transparent,#00ffcc,transparent);
-  margin:15px;
+height:2px;
+background:linear-gradient(to right,transparent,#00ffcc,transparent);
+margin:15px;
 }
 
 /* BUTTONS */
 .btn{
-  margin:8px;
-  padding:10px 15px;
-  border:none;
-  border-radius:10px;
-  background:#00ffcc;
-  cursor:pointer;
-  font-weight:bold;
+margin:8px;
+padding:10px 15px;
+border:none;
+border-radius:10px;
+background:#00ffcc;
+cursor:pointer;
+font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<!-- APP NAME -->
+<!-- 🔥 APP NAME -->
 <div class="appTitle">Life Lines Wisdoms</div>
 
 <!-- CATEGORY -->
-<div class="categoryBar">
-  <button class="categoryBtn active" onclick="filterCategory('all',this)">All</button>
-  <button class="categoryBtn" onclick="filterCategory('love',this)">Love</button>
-  <button class="categoryBtn" onclick="filterCategory('pain',this)">Pain</button>
-  <button class="categoryBtn" onclick="filterCategory('motivation',this)">Motivation</button>
-  <button class="categoryBtn" onclick="filterCategory('life',this)">Life</button>
-  <button class="categoryBtn" onclick="filterCategory('sad',this)">Sad</button>
-  <button class="categoryBtn" onclick="filterCategory('islamic',this)">Islamic</button>
+<div class="categoryBar" id="categoryBar">
+  <!-- Buttons will be dynamically generated with counts -->
 </div>
 
 <!-- CARD -->
 <div class="card" id="card">
-  <h2 id="title"></h2>
-  <div class="divider"></div>
-  <p class="p1" id="p1"></p>
-  <p class="p2" id="p2"></p>
-  <p class="p3" id="p3"></p>
-  <p class="p4" id="p4"></p>
-  <p class="p5" id="p5"></p>
-  <div class="divider"></div>
-  <p class="note" id="note"></p>
+<h2 id="title"></h2>
+
+<div class="divider"></div>
+
+<p class="p1" id="p1"></p>
+<p class="p2" id="p2"></p>
+<p class="p3" id="p3"></p>
+<p class="p4" id="p4"></p>
+<p class="p5" id="p5"></p>
+
+<div class="divider"></div>
+
+<p class="note" id="note"></p>
 </div>
 
 <!-- BUTTONS -->
 <div>
-  <button class="btn" onclick="nextQuote()">Next</button>
-  <button class="btn" onclick="downloadAndShare()">Download & Share</button>
+<button class="btn" onclick="previousQuote()">Previous</button>
+<button class="btn" onclick="shareQuote()">Share & Download</button>
+<button class="btn" onclick="nextQuote()">Next</button>
 </div>
 
 <script>
-let quotes = [];
-let filteredQuotes = [];
-let index = 0;
+let quotes=[];
+let filteredQuotes=[];
+let index=0;
+let categories=["love","pain","motivation","life","sad","islamic"];
+let categoryCounts={};
 
-// Load quotes.json
+// Fetch quotes.json
 fetch("quotes.json")
-.then(res => res.json())
-.then(data => {
-  quotes = data.quotes;
-  filteredQuotes = quotes;
+.then(res=>res.json())
+.then(data=>{
+  quotes=data.quotes;
+  filteredQuotes=quotes;
+  countCategories();
+  generateCategoryButtons();
   showQuote();
-})
-.catch(err => {
-  alert("Error loading quotes!");
-  console.log(err);
 });
 
-// Show current quote
+// Count quotes in each category and total
+function countCategories(){
+  categoryCounts={all:quotes.length};
+  categories.forEach(cat=>{
+    categoryCounts[cat]=quotes.filter(q=>q.category===cat).length;
+  });
+}
+
+// Generate category buttons with counts
+function generateCategoryButtons(){
+  const bar=document.getElementById("categoryBar");
+  bar.innerHTML="";
+  // All button first
+  const allBtn=document.createElement("button");
+  allBtn.className="categoryBtn active";
+  allBtn.innerText=`All (${categoryCounts.all})`;
+  allBtn.onclick=function(){filterCategory('all',this);};
+  bar.appendChild(allBtn);
+
+  // Other categories
+  categories.forEach(cat=>{
+    const btn=document.createElement("button");
+    btn.className="categoryBtn";
+    btn.innerText=`${capitalize(cat)} (${categoryCounts[cat]})`;
+    btn.onclick=function(){filterCategory(cat,this);};
+    bar.appendChild(btn);
+  });
+}
+
+// Capitalize first letter
+function capitalize(str){
+  return str.charAt(0).toUpperCase()+str.slice(1);
+}
+
+// Show quote
 function showQuote(){
-  let q = filteredQuotes[index];
-  title.innerHTML = q.title.replace(/\n/g,"<br>");
-  p1.innerHTML = q.p1.replace(/\n/g,"<br>");
-  p2.innerHTML = q.p2.replace(/\n/g,"<br>");
-  p3.innerHTML = q.p3.replace(/\n/g,"<br>");
-  p4.innerHTML = q.p4.replace(/\n/g,"<br>");
-  p5.innerHTML = q.p5.replace(/\n/g,"<br>");
-  note.innerHTML = q.note;
+  let q=filteredQuotes[index];
+  if(!q) return;
+  title.innerHTML=q.title.replace(/\n/g,"<br>");
+  p1.innerHTML=q.p1.replace(/\n/g,"<br>");
+  p2.innerHTML=q.p2.replace(/\n/g,"<br>");
+  p3.innerHTML=q.p3.replace(/\n/g,"<br>");
+  p4.innerHTML=q.p4.replace(/\n/g,"<br>");
+  p5.innerHTML=q.p5.replace(/\n/g,"<br>");
+  note.innerHTML=q.note;
 }
 
-// Next quote
-function nextQuote(){
-  index = (index + 1) % filteredQuotes.length;
-  showQuote();
-}
+// Next & Previous
+function nextQuote(){index=(index+1)%filteredQuotes.length;showQuote();}
+function previousQuote(){index=(index-1+filteredQuotes.length)%filteredQuotes.length;showQuote();}
 
-// Filter by category
+// Filter category
 function filterCategory(cat,btn){
   document.querySelectorAll('.categoryBtn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  filteredQuotes = cat==="all" ? quotes : quotes.filter(q=>q.category===cat);
+  filteredQuotes=cat==="all"?quotes:quotes.filter(q=>q.category===cat);
   index=0;
   showQuote();
 }
 
-// Download & Share directly
-function downloadAndShare(){
+// Share & Download as JPG
+function shareQuote(){
   html2canvas(document.getElementById("card")).then(canvas=>{
-    // Convert to blob
-    canvas.toBlob(function(blob){
-      // Create a temporary file and trigger sharing
-      const file = new File([blob], "quote.jpg", {type: "image/jpeg"});
-      
-      if(navigator.canShare && navigator.canShare({files:[file]})){
+    const link=document.createElement("a");
+    link.download="quote.jpg";
+    link.href=canvas.toDataURL("image/jpeg");
+    link.click();
+
+    // Also open share options (WhatsApp, etc)
+    if(navigator.share){
+      canvas.toBlob(blob=>{
+        const file=new File([blob],"quote.jpg",{type:"image/jpeg"});
         navigator.share({
-          files: [file],
-          title: "Life Lines Wisdoms",
-          text: "Check out this quote!"
-        }).then(()=>console.log("Shared successfully"))
-        .catch(err=>console.log("Error sharing", err));
-      } else {
-        // fallback: download manually
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(file);
-        link.download = "quote.jpg";
-        link.click();
-        alert("Your device does not support direct sharing. The image has been downloaded.");
-      }
-    });
+          files:[file],
+          text:"Check this amazing quote!",
+        });
+      });
+    } else {
+      alert("Your device does not support direct sharing. You can download the image and share manually.");
+    }
   });
 }
 </script>
